@@ -12,7 +12,7 @@ devtools::install_github("labja/RollingSix")
 
 ### Setting parameters 
 ``` r
-library(IntraPat)
+library(RollingSix)
 design <- "RollingSix"
 tox_rates <- seq(0.1,0.5,0.1)
 futime <- 50
