@@ -1,0 +1,6 @@
+import(magrittr)
+import(dplyr)
+importFrom("stats", "median", "rbinom", "rexp", "runif")
+export(sim_trial)
+export(sim_trials)
+export(summary_trial)
