@@ -53,48 +53,58 @@ determine_mtd <- function(design,res_dlt) {
 determine_dose_r6 <- function(res_dlt,res_time,t,tox_rates) {
   
   
+ determine_dose_r6 <- function(res_dlt,res_time,t,tox_rates) {
+  
+  decision_table <- get_decision_table_r6()
+  
   # Summarize results so far
   res <- merge(res_dlt,res_time)
+  all_summary <- res %>% group_by(dose) %>% summarise(n=n(),n_dlt=sum(dlt),.groups="drop_last")
+  pending_summary <- res %>% filter(t_end_treat > t) %>% group_by(dose) %>% summarise(n=n(),n_dlt=sum(dlt),.groups="drop_last")
+  known_summary <- res %>% filter(t_end_treat <= t) %>% group_by(dose) %>% summarise(n=n(),n_dlt=sum(dlt),.groups="drop_last")
   
-  all_summary <- res %>% dplyr::group_by(dose) %>% dplyr::summarise(n=n(),n_dlt=sum(dlt),.groups="drop_last")
-  pending_summary <- res %>% dplyr::filter(t_end_treat >= t) %>% dplyr::group_by(dose) %>% dplyr::summarise(n=n(),n_dlt=sum(dlt),.groups="drop_last")
-  known_summary <- res %>% dplyr::filter(t_end_treat < t) %>% dplyr::group_by(dose) %>% dplyr::summarise(n=n(),n_dlt=sum(dlt),.groups="drop_last")
-  
-  # Creat data frames with all results at last dose and with pending results at last dose
+  # Determine last dose
   last_dose <- max(1,res_dlt$dose[nrow(res_dlt)])
   
-  same_dose_all <- all_summary %>% filter(dose==last_dose)
-  same_dose_pending <- pending_summary %>% filter(dose==last_dose)  
+  # Set t to a later time if previous patients at last dose had to wait
+  t_last_dose_last_start <- res %>% filter(dose==last_dose) %>% select(t_start_treat) %>% last()
+  t <- max(t,t_last_dose_last_start)
   
-  if (same_dose_all$n == 6 & nrow(pending_summary)> 0) {
+  # Look up escalation decision in lookup table
+  n_pat <- all_summary %>% filter(dose==last_dose) %>% select(n) %>% as.numeric()
+  n_pending <- pending_summary %>% filter(dose==last_dose) %>% select(n) %>% as.numeric() %>% replace_na(0)
+  n_dlt <- known_summary %>% filter(dose==last_dose) %>% select(n_dlt) %>% as.numeric() %>% replace_na(0)
+  decision <- sysdata$decision[decision_table$n_pat==n_pat & sysdata$n_dlt==n_dlt & sysdata$n_pending==n_pending]
+  
+  
+  if (decision=="Suspend") {
     
     # 6 patients have been assigned to last dose and some results are pending -> wait
-    t <- max(res_time$t_end_treat) + 1
+    t <- max(res_time$t_end_treat) 
     dose_decision <- determine_dose_r6(res_dlt=res_dlt,res_time=res_time,t=t,tox_rates=tox_rates)
     new_dose <- dose_decision$dose
     stop <- stopcheck_r6(res_summary=all_summary,new_dose=new_dose,tox_rates=tox_rates)
     
     
-  } else  {
+  } else if (decision %in% c("Escalate","De-escalate")) {
     
     # Not necessary to wait -> determine next dose right away
-    new_dose <- determine_dose_r6_help(res_summary=known_summary,last_dose=last_dose)
+    new_dose <- ifelse(decision=="Escalate",last_dose+1,last_dose-1)
     
     # If the next dose is different it needs to be checked if recruitment at that dose is still intended 
-    if (new_dose!=last_dose) {
+    # If the dose decision from the lower dose is escalation and the dose decision from the higher dose is de-escalation pick the lower dose
+     new_dose1 <- determine_dose_r6_help(res_summary=known_summary,last_dose=new_dose)
+     if (new_dose!=new_dose1) new_dose <- min(new_dose,new_dose1)
+     
+     # Check if stop criteria are reached
+     stop <- stopcheck_r6(res_summary=known_summary,new_dose=new_dose,tox_rates=tox_rates)
       
-      # If the dose decision from the lower dose is escalation and the dose decision from the higher dose is de-escalation pick the lower dose
-      new_dose1 <- determine_dose_r6_help(res_summary=known_summary,last_dose=new_dose)
-      if (new_dose!=new_dose1) new_dose <- min(new_dose,new_dose1)
-      
+    } else if (decision=="Stay") {
+    
+    new_dose <- last_dose  
+    stop <- FALSE
+    
     }
-    
-    # Check if stop criteria are reached
-    stop <- stopcheck_r6(res_summary=known_summary,new_dose=new_dose,tox_rates=tox_rates)
-    
-    
-  }      
-  
   
   return(list(stop=stop,dose=new_dose,t=t))
   
