@@ -52,11 +52,6 @@ determine_mtd <- function(design,res_dlt) {
 
 determine_dose_r6 <- function(res_dlt,res_time,t,tox_rates) {
   
-  
- determine_dose_r6 <- function(res_dlt,res_time,t,tox_rates) {
-  
-  decision_table <- get_decision_table_r6()
-  
   # Summarize results so far
   res <- merge(res_dlt,res_time)
   all_summary <- res %>% group_by(dose) %>% summarise(n=n(),n_dlt=sum(dlt),.groups="drop_last")
@@ -107,37 +102,6 @@ determine_dose_r6 <- function(res_dlt,res_time,t,tox_rates) {
     }
   
   return(list(stop=stop,dose=new_dose,t=t))
-  
-}
-
-# Helper function for determine_dose_r6
-
-determine_dose_r6_help <- function(res_summary,last_dose) {
-  
-  res_same_dose <- res_summary %>% filter(dose==last_dose)
-  n_dlt <- res_same_dose$n_dlt
-  n <- res_same_dose$n
-  
-  if (nrow(res_same_dose)==0) {
-    
-    new_dose <- last_dose
-    
-  } else if (n_dlt>=2) {
-    
-    # De-escalation
-    new_dose <- last_dose - 1
-    
-  } else if ((n >=3 & n_dlt==0) | (n==6 & n_dlt==1)) {
-    
-    # Escalation
-    new_dose <- last_dose + 1
-    
-  } else {
-    # Else stay at same dose
-    new_dose <- last_dose
-  } 
-  
-  return(new_dose)
   
 }
 
