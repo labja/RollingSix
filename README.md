@@ -117,7 +117,7 @@ multiple_trials$res
 #     2    18     3      3        24.0         63            181
 #     3    22     6     16        21.5        326            167
 ```
-The output is a data frame where each simulated trial is represented by a row. The first row corresponds to the example above for a single trial. Over the 10 simulated the dose level 1, 2 and 3 are estimated to be the MTD and in trial 6 all of the dose levels are deemd too toxic. Additionally, trial 6 is also the only trial in which no patient had to wait before receiving treatment.
+The output is a data frame where each simulated trial is represented by a row. The first row corresponds to the example above for a single trial. Over the 10 simulated trials each of the dose level 1, 2 and 3 are estimated to be the MTD and in trial 6 all of the dose levels are deemd too toxic. Additionally, trial 6 is also the only trial in which no patient had to wait before receiving treatment.
 
 ### Summarizing multiple trials
 TBD
