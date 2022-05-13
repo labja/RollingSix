@@ -69,7 +69,7 @@ determine_dose_r6 <- function(res_dlt,res_time,t,tox_rates) {
   n_pat <- all_summary %>% filter(dose==last_dose) %>% select(n) %>% as.numeric()
   n_pending <- pending_summary %>% filter(dose==last_dose) %>% select(n) %>% as.numeric() %>% tidyr::replace_na(0)
   n_dlt <- known_summary %>% filter(dose==last_dose) %>% select(n_dlt) %>% as.numeric() %>% tidyr::replace_na(0)
-  decision <- sysdata$decision[decision_table$n_pat==n_pat & sysdata$n_dlt==n_dlt & sysdata$n_pending==n_pending]
+  decision <- sysdata$decision[sysdata$n_pat==n_pat & sysdata$n_dlt==n_dlt & sysdata$n_pending==n_pending]
   
   
   if (decision=="Suspend") {
