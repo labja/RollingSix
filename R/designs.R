@@ -25,7 +25,7 @@ determine_dose <- function(design,tox_rates,start,res_dlt,res_time,t) {
     stop <- res_list$stop
     dose <- res_list$dose
     t <- res_list$t
-  
+    
   }
   
   return(res_list)
@@ -36,14 +36,14 @@ determine_dose <- function(design,tox_rates,start,res_dlt,res_time,t) {
 
 determine_mtd <- function(design,res_dlt) {
   
-
-    
-    mtd_est <- switch(design
-                       #, BCRM=determine_dose_crm(res_dlt_known=res_dlt_known,stop_bcrm=stop_bcrm,prior=prior,target=target,constrain=constrain,method_bcrm=method_bcrm,t=t)
-                       #, TPT=determine_dose_tpt(res_dlt_known=res_dlt_known,res_dlt=res_dlt,t=t)
-                       , RollingSix=determine_mtd_r6(res_dlt=res_dlt)) 
-
-     return(mtd_est)
+  
+  
+  mtd_est <- switch(design
+                    #, BCRM=determine_dose_crm(res_dlt_known=res_dlt_known,stop_bcrm=stop_bcrm,prior=prior,target=target,constrain=constrain,method_bcrm=method_bcrm,t=t)
+                    #, TPT=determine_dose_tpt(res_dlt_known=res_dlt_known,res_dlt=res_dlt,t=t)
+                    , RollingSix=determine_mtd_r6(res_dlt=res_dlt)) 
+  
+  return(mtd_est)
   
 }
 
@@ -81,25 +81,28 @@ determine_dose_r6 <- function(res_dlt,res_time,t,tox_rates) {
     stop <- stopcheck_r6(res_summary=all_summary,new_dose=new_dose,tox_rates=tox_rates)
     
     
-  } else if (decision %in% c("Escalate","De-escalate")) {
+  } else if (decision=="Escalate") {
     
     # Not necessary to wait -> determine next dose right away
-    new_dose <- ifelse(decision=="Escalate",last_dose+1,last_dose-1)
+    new_dose <- last_dose+1
     
-    # If the next dose is different it needs to be checked if recruitment at that dose is still intended 
-    # If the dose decision from the lower dose is escalation and the dose decision from the higher dose is de-escalation pick the lower dose
-     new_dose1 <- determine_dose_r6_help(res_summary=known_summary,last_dose=new_dose)
-     if (new_dose!=new_dose1) new_dose <- min(new_dose,new_dose1)
-     
-     # Check if stop criteria are reached
-     stop <- stopcheck_r6(res_summary=known_summary,new_dose=new_dose,tox_rates=tox_rates)
-      
-    } else if (decision=="Stay") {
+    n_dlt_new_dose <- known_summary %>% filter(dose==new_dose) %>% select(n_dlt) %>% as.numeric() %>% tidyr::replace_na(0)
+    if (n_dlt_new_dose>=2) new_dose <- new_dose - 1
+    
+    # Check if stop criteria are reached
+    stop <- stopcheck_r6(res_summary=known_summary,new_dose=new_dose,tox_rates=tox_rates)
+    
+  } else if (decision=="De-escalate") {
+    
+    new_dose <- last_dose-1
+    stop <- stopcheck_r6(res_summary=known_summary,new_dose=new_dose,tox_rates=tox_rates)
+
+   } else if (decision=="Stay") {
     
     new_dose <- last_dose  
     stop <- FALSE
     
-    }
+  }
   
   return(list(stop=stop,dose=new_dose,t=t))
   
