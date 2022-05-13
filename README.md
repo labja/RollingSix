@@ -20,6 +20,7 @@ accrual <- 50
 nsim <- 10
 seed <- 1
 ```
+* Test
 So far there are no alternative design choices. futime is follow up time in days and accrual is expected number of patients recruited in a year.
 
 ### Simulating a single trial
