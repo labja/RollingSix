@@ -84,10 +84,10 @@ summary_trial(single_trial)
 # [1] 3
 # 
 # $median_wait
-# [1] 19
+# [1] 9
 # 
 # $total_wait
-# [1] 59
+# [1] 29
 # 
 # $trial_duration
 # [1] 101
