@@ -106,16 +106,16 @@ summary_trial(single_trial)
 multiple_trials <- sim_trials(tox_rates=tox_rates,design=design,futime=futime,accrual=accrual,nsim=nsim,seed=seed)
 multiple_trials$res
 # mtd_est n_pat n_dlt n_wait median_wait total_wait trial_duration
-#     1    12     2      3        19.0         59            101
+#     1    12     2      3         9.0         29            101
 #     1    10     3      3        20.0         56            112
-#     1    12     2      3        13.0         41            121
-#     3    22     3     10        11.5        112            170
+#     1    12     2      3        11.0         35            121
+#     3    22     3      8         8.5         75            167
 #     1    12     3      1        14.0         14            137
 #     0     6     2      0          NA          0             83
-#     3    24     5      6        12.5         80            226
-#     2    18     2      8        19.5        144            169
-#     2    18     3      3        24.0         63            181
-#     3    22     6     16        21.5        326            167
+#     3    24     5      4        15.0         57            226
+#     2    18     2      7        16.0        107            169
+#     2    18     3      3        21.0         56            181
+#     3    22     6     14        16.5        253            165
 ```
 The output is a data frame where each simulated trial is represented by a row. The first row corresponds to the example above for a single trial. Over the 10 simulated trials each of the dose level 1, 2 and 3 are estimated to be the MTD and in trial 6 all of the dose levels are deemd too toxic. Additionally, trial 6 is also the only trial in which no patient had to wait before receiving treatment.
 
