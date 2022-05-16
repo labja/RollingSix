@@ -75,17 +75,20 @@ determine_dose_r6 <- function(res_dlt,res_time,t,tox_rates) {
   if (decision=="Suspend") {
     
     # 6 patients have been assigned to last dose and some results are pending -> wait
+    
+    # 5 out of 5 patients didn't experience a DLT -> escalate
     if (nrow(res_dlt[res_dlt$dose==last_dose,])>4 & sum(res_dlt$dlt[res_dlt$dose==last_dose][1:5])==0) {
       
-      print("HERE")
       t <- nth(sort(res_time$t_end_treat,decreasing=TRUE),2)
       new_dose <- last_dose + 1
 
     } else {
       
+      # Re-evaluate after all pending patients are observed
       t <- max(res_time$t_end_treat) 
       dose_decision <- determine_dose_r6(res_dlt=res_dlt,res_time=res_time,t=t,tox_rates=tox_rates)
       new_dose <- dose_decision$dose
+      
      }
     stop <- stopcheck_r6(res_summary=all_summary,new_dose=new_dose,tox_rates=tox_rates)
     
