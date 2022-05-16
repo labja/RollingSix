@@ -54,9 +54,9 @@ single_trial
 # 4         17          25            25          55
 # 5         25          29            29          59
 # 6         29          39            39          69
-# 7         39          40            69          99
-# 8         40          50            69          74
-# 9         50          58            69          99
+# 7         39          40            59          99
+# 8         40          50            59          74
+# 9         50          58            59          99
 # 10        58          70            70         100
 # 11        70          71            71         101
 # 12        71          76            76          92
@@ -65,7 +65,7 @@ single_trial
 # [1] 1
 ```
 * **res_dlt** Data frame with dose level and DLT result for each patient. In this case the first six patients receive dose level 1 without any observed DLTs. Patients 7 to 12 receive dose level 2 with patient 8 and patient 12 experiencing a DLT
-* **res_time** Data frame with important time points in days since trial start for each patient. The first six patients can start treatment as soon as they are recruited at dose level 1. Patients 7, 8 and 9 are recruited between days 40 and 58 but need to wait until day 69 before receiving dose level 2. The reason is that day 69 is the earliest day on which all DLT results for dose level 1 are known.
+* **res_time** Data frame with important time points in days since trial start for each patient. The first six patients can start treatment as soon as they are recruited at dose level 1. Patients 7, 8 and 9 are recruited between days 40 and 58 but need to wait until day 59 before receiving dose level 2. The reason is that on day 59 five out of five patients at dose level 1 have been fully observed without any DLTs and regardless of the DLT result for patient 6 the dose will be escalated.
 * **mtd_est** The estimated MTD at the end of the trial which is dose level 1 in this case 
 
 ### Summarizing a single trial
